@@ -1,0 +1,101 @@
+﻿@inject HttpClient httpClient
+@inject IJSRuntime jsRuntime
+
+<style>
+    .hrBorder {
+        border-width: 2px;
+    }
+</style>
+
+<div class="container card shadow-lg p-3 mb-5 bg-body rounded overflow-auto">
+
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center">Status</h1>
+        </div>
+
+        <div class="col-12">
+            <br />
+        </div>
+
+        <div class="col-12">
+            <nav class="navbar navbar-expand bg-light navbar-light justify-content-center">
+                @foreach (var items in applicationPhases)
+                {
+                    <button class="btn nav-link flex-row" type="button" @onclick="() => JobApplicationPhase(items.Id)">
+                        <h5>@items.Description</h5>
+                        <span>@myJobsViewModelCollect.Count(x => x.Application.ApplicationPhaseId == items.Id)</span>
+                    </button>
+                }
+            </nav>
+        </div>
+
+        <div class="col-12">
+            <hr class="hrBorder" />
+        </div>
+        <div class="col-12">
+            <br />
+        </div>
+        <div class="col-12">
+            @if (myJobsViewModelDisplay != null && myJobsViewModelDisplay.Count != 0)
+            {
+
+                foreach (var item in myJobsViewModelDisplay)
+                {
+                    <div class="card text-center">
+                        <div class="card-body">
+
+                            <h4 class="card-title">@item.Job.Title</h4>
+                            <hr />
+                            <p class="card-text">
+                                @item.Application.ApplicationPhase.Description -  @item.Application.Status.Description
+                            </p>
+                        </div>
+                    </div>
+                    <br />
+                }
+            }
+            else
+            {
+                <h5 class="text-center">No Job List Are Available Here</h5>
+            }
+        </div>
+    </div>
+</div>
+
+@code{
+
+    int phaseID = 3;
+
+    List<ApplicationPhase> applicationPhases { get; set; } = new List<ApplicationPhase>();
+    List<myJobsViewModel> myJobsViewModels { get; set; } = new List<myJobsViewModel>();
+
+    List<myJobsViewModel> myJobsViewModelCollect { get; set; } = new List<myJobsViewModel>();
+    List<myJobsViewModel> myJobsViewModelDisplay { get; set; } = new List<myJobsViewModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        applicationPhases = await httpClient.GetFromJsonAsync<List<ApplicationPhase>>("api/ApplicationPhase");
+        myJobsViewModels = await httpClient.GetFromJsonAsync<List<myJobsViewModel>>($"api/ApplicationPhaseHelper/myJobs?AppUserId=9");
+
+        if (myJobsViewModels.Count(x => x.Application.ApplicationPhaseId == 1) > 1)
+        {
+            myJobsViewModelCollect = await httpClient.GetFromJsonAsync<List<myJobsViewModel>>($"api/ApplicationPhaseHelper/myJobs?AppUserId=9");
+            myJobsViewModelCollect = myJobsViewModelCollect.GroupBy(x => x.Job.Id).Select(g => g.Last()).ToList();
+        }
+    }
+
+    private void JobApplicationPhase(int value)
+    {
+        myJobsViewModelDisplay = myJobsViewModelCollect.Where(x => x.Application.ApplicationPhaseId == value).ToList();
+    }
+
+    private class myJobsViewModel
+
+    {
+
+        public Job Job { get; set; }
+        public ApplicationPhaseHelper Application { get; set; }
+
+    }
+}

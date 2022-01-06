@@ -1,0 +1,185 @@
+﻿@page "/candidate-analytics"
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+@inject HttpClient client
+@inject State State
+@inject HttpClient HttpClient
+@*TODO: ADD MAX AND MIN WIDTHS TO MAIN DIV*@
+<style>
+    .report {
+        width: 95%;
+        height: 95%;
+        margin: auto;
+    }
+
+    .report-container {
+        width: 95%;
+        height: 90%;
+        margin: auto;
+        display: flex;
+    }
+
+    iframe {
+        border-radius: 5px;
+        height: 100%;
+        width: 95%;
+    }
+
+    .enlarge-iframe-div {
+        height: 50px;
+        width: 5%;
+        text-align: center;
+        margin-top: 0;
+    }
+
+    .big {
+        height: 88vh;
+        width: 100%;
+        background-color: black;
+        position: absolute;
+        z-index: 1;
+        margin-top: -12vh;
+        display: flex;
+    }
+
+    .big-main {
+        height: 90%;
+        margin-top: 2.5%;
+        margin-bottom: 5%;
+        width: 90%;
+        margin-left: 5%;
+    }
+
+    .compress-iframe-div {
+        height: 5%;
+        justify-content: center;
+        justify-items: center;
+        align-content: center;
+        align-items: center;
+        margin: auto;
+        width: 5%;
+        text-align: center;
+    }
+
+    .report {
+        width: 90%;
+        height: 95%;
+        margin-left: 5%;
+    }
+
+    .report-nav {
+        width: 100%;
+        height: 10%;
+        display: flex;
+    }
+
+    .report-buttons {
+        width: 30%;
+        margin: auto;
+        height: 80%;
+        color: black;
+        font-weight: 700;
+        font-size: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+        .report-buttons:hover {
+            width: 30%;
+            margin: auto;
+            height: 80%;
+            color: ivory;
+            font-weight: 700;
+            font-size: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: rgb(0,0,0,0.5);
+        }
+
+        .report-buttons:focus {
+            width: 30%;
+            margin: auto;
+            height: 80%;
+            color: ivory;
+            font-weight: 700;
+            font-size: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: rgb(0,0,0,0.5);
+        }
+
+
+    .custom-select {
+        transition: height .4s ease;
+    }
+
+    /*Dropdown styling - start*/
+    .app-form-control {
+        width: 100%;
+        padding: 10px 0;
+        background: none;
+        border: none;
+        border-bottom: 1px solid #666;
+        /*color: #ddd;*/
+        font-size: 14px;
+        text-transform: uppercase;
+        outline: none;
+        cursor: pointer;
+        margin: 10px;
+    }
+
+        .app-form-control::placeholder {
+            color: #666;
+        }
+    option {
+        background: #6c85a3;
+        color: whitesmoke;
+        margin: 10px;
+    }
+
+    .label {
+        color: #937a5c;
+        text-transform: uppercase;
+    }
+
+    /*Dropdown styling - end*/
+</style>
+
+<div class="report">
+    <div class="report-nav">
+        <div class="report-buttons">
+            <label for="phase" class="col-sm-3 label">Department</label>
+            <select class="app-form-control" id="phase">
+                <option selected>Select Department</option>
+                <option value="Administration">Administration</option>
+                <option value="Engineering">Engineering</option>
+                <option value="Finance">Finance</option>
+                <option value="IT">IT</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Research">Research</option>
+                <option value="Sales">Sales</option>
+            </select>
+        </div>
+
+        <div class="report-buttons">
+            <label for="status" class="col-sm-3 label">Job</label>
+            <select class="app-form-control" id="status">
+                <option selected>Select Job</option>
+                <option value="Administration">Administration</option>
+                <option value="Engineering">Engineering</option>
+                <option value="Finance">Finance</option>
+                <option value="IT">IT</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Research">Research</option>
+                <option value="Sales">Sales</option>
+            </select>
+        </div>
+    </div>
+    <div class="report-container">
+
+    </div>
+</div>
+
+@code{
+
+}

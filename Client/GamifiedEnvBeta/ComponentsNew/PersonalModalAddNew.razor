@@ -1,0 +1,335 @@
+@inject State State
+@inject IJSRuntime jsRuntime
+@inject HttpClient http
+
+<style>
+
+    @@importurl('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800&display=swap');
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .modal-wrapper {
+
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        background-color: rgba(0, 0, 0, 0.9);
+
+    }
+
+    .upper button
+    {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    .lower {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-right: 10px;
+    }
+
+    /*form styles*/
+    .input-form {
+        background-color: #fff;
+        padding: 10px;
+        height: 90%;
+        width: 90%;
+        margin: auto;
+        max-width: 800px;
+        max-height: 600px;
+        display: flex;
+        flex-direction: column;
+        border-radius: 5px;
+        overflow-y: auto;
+        background-color: #283747;
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+    }
+
+    .input-form::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    .input-form::-webkit-scrollbar-track {
+        background-color: #EAF2F8;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+
+    .input-form::-webkit-scrollbar-thumb {
+        background-color: #95A5A6;
+        border: 3px solid #EAF2F8;
+        border-radius: 20px;
+    }
+
+    .inline {
+        width: 90%;
+        margin: auto;
+        display: flex;
+    }
+
+
+    .inline-inner {
+        width: 45%;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        font-size: 14px;
+        font-weight: bold;
+        margin-top: 1rem;
+        margin-bottom: 0px;
+        color: #fff;
+    }
+
+    .inline-inner input,
+    select {
+        padding: 5px 7px;
+        border-radius: 5px;
+        border: 0.5px solid #7C7C7C;
+        font-size: 13px;
+    }
+
+    .inline-inner input:focus,
+    select:focus,
+    .address-inner textarea:focus {
+        outline: none !important;
+        border: 1px solid #0077b6;
+        box-shadow: 0 0 10px #719ECE;
+    }
+
+    .address-inner {
+        width: 80%;
+    }
+
+    .address-inner textarea {
+        height: 150px;
+        padding: 5px 10px;
+        resize: none;
+        border-radius: 5px;
+        border: 0.5px solid #7C7C7C;
+    }
+
+    .btn-container,
+    .form-title {
+        padding: 1rem 0;
+        width: 90%;
+        margin: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+</style>
+
+<div class="modal-wrapper">
+
+    <div class="upper">
+        <button class="btn btn-danger btn-sm" @onclick="@(() => TogglePersonalAddNewModal.InvokeAsync())">Close</button>
+    </div>
+
+    <div class="lower">
+
+        <form class="input-form">
+
+            <div class="inline">
+
+                <div class="inline-inner">
+                    <label for="firstName">First Name:</label>
+                    <input type="text" id="firstName" @bind="Personal.FirstName">
+                </div>
+
+                <div class="inline-inner">
+                    <label for="lastName">Last Name:</label>
+                    <input type="text" id="lastName" @bind="Personal.LastName">
+                </div>
+
+
+            </div>
+
+            <div class="inline">
+
+                <div class="inline-inner">
+                    <label for="phoneNumber">Phone Number:</label>
+                    <input type="text" id="phoneNumber" @bind="Personal.PhoneNumber">
+                </div>
+
+                <div class="inline-inner">
+                    <label for="email">Email:</label>
+                    <input type="text" id="email" @bind="Personal.Email">
+                </div>
+
+            </div>
+
+            <div class="inline">
+
+                <div class="inline-inner">
+                    <label for="idNumber">I.D Number:</label>
+                    <input type="text" id="idNumber" @bind="Personal.IdNumber">
+                </div>
+
+                <div class="inline-inner">
+                    <label for="province">Province:</label>
+                    <select id="province" @onchange="OnProvinceChanged">
+                        <option value="--">--</option>
+                        <option value="Eastern Cape">Eastern Cape</option>
+                        <option value="Free State">Free State</option>
+                        <option value="Gauteng">Gauteng</option>
+                        <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+                        <option value="Limpopo">Limpopo</option>
+                        <option value="Mpumalanga">Mpumalanga</option>
+                        <option value="Northern Cape">Northern Cape</option>
+                        <option value="North West">North West</option>
+                        <option value="Western Cape">Western Cape</option>
+                    </select>
+                </div>
+
+            </div>
+
+            @* <div class="inline">
+
+                <div class="inline-inner">
+
+                    <label for="disability">Disabilty:</label>
+                    <select id="disability" @onchange="OnDisabilityChanged">
+                        <option value="--">--</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="both">Don't wish to disclose</option>
+                    </select>
+
+                </div>
+
+                <div class="inline-inner">
+
+                    <label for="gender">Gender:</label>
+                    <select id="gender" @onchange="OnGenderChanged">
+                        <option value="--">--</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="both">Don't wish to disclose</option>
+                    </select>
+
+                </div>
+
+            </div> *@
+
+            @* <div class="inline">
+                <div class="inline-inner address-inner">
+                    <label for="address">Address:</label>
+                    <textarea id="address" @bind="Personal.Address"></textarea>
+                </div>
+            </div> *@
+
+          
+            <div class="btn-container">
+
+                <button type="button" class="btn btn-success btn-sm mt-2" @onclick="Save">Save</button>
+                <p style="color:#fff;" class="mt-4 ml-3">@message</p>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+@code
+{
+    [Parameter] public EventCallback<int> TogglePersonalAddNewModal { get; set; }
+
+
+    private PersonalInformation Personal = new PersonalInformation();
+    private AdditionalInformation Additional = new AdditionalInformation();
+
+    private string message = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> DisabilityChanged
+    {
+        get;
+        set;
+    }
+
+    [Parameter]
+    public EventCallback<string> GenderChanged
+    {
+        get;
+        set;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        var userdata = await jsRuntime.InvokeAsync<string>("localStorage.getItem", "user").ConfigureAwait(false);
+        if (!string.IsNullOrWhiteSpace(userdata))
+        {
+            string[] userdetails = userdata.Split(';');
+            State.UserEmail = userdetails[0];
+            State.Role = userdetails[1].ToLower();
+            State.Id = Int32.Parse(userdetails[3]);
+
+        }
+
+        Additional = new AdditionalInformation();
+        Additional.AppUserId = State.Id;
+
+        Personal = new PersonalInformation();
+        Personal.AppUserId = State.Id;
+
+        State.IsSaved = false;
+    }
+
+    [Parameter]
+    public EventCallback<string> ProvinceChanged
+    {
+        get;
+        set;
+    }
+
+     private Task OnProvinceChanged(ChangeEventArgs e)
+    {
+        //change Disability to province
+        @* Additional.Disability = e.Value.ToString();
+        return ProvinceChanged.InvokeAsync(Additional.Disability); *@
+        return null;
+    }
+
+    private Task OnDisabilityChanged(ChangeEventArgs e)
+    {
+        Additional.Disability = e.Value.ToString();
+        return DisabilityChanged.InvokeAsync(Additional.Disability);
+    }
+
+
+    private Task OnGenderChanged(ChangeEventArgs e)
+    {
+        Additional.Gender = e.Value.ToString();
+        return GenderChanged.InvokeAsync(Additional.Gender);
+    }
+
+    private async Task Save()
+    {
+        await http.PostAsJsonAsync("api/PersonalInformation", Personal);
+        
+
+        message = "Saved!";
+        State.IsSaved = true;
+
+    }
+
+}

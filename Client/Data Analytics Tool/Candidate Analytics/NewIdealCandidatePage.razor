@@ -1,0 +1,719 @@
+﻿@page "/ideal"
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+@inject HttpClient client
+@inject State State
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800&display=swap');
+
+    * {
+        font-family: 'Montserrat', sans-serif;
+    }
+
+
+    .wrapper {
+        height: 100vh;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .nav {
+        height: 8vh;
+        background-color: #6c85a3;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 0.8rem;
+        box-shadow: rgba(0, 0, 0, 0.2) 0px 12px 28px 0px, rgba(0, 0, 0, 0.1) 0px 2px 4px 0px, rgba(255, 255, 255, 0.05) 0px 0px 0px 1px inset;
+    }
+
+    .main-body {
+        height: 86vh;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        @* background-color: pink; *@
+    }
+
+
+
+    /*FOOTER*/
+    .footer-container {
+        width: 100%;
+        height: 6vh;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+         background-color: #6c85a3;
+         color: #fff;
+    }
+
+    .footer-container span {
+        font-size: 13px;
+        font-weight: bold;
+        margin-right: 2rem;
+    }
+
+    .sidenav {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        right: 0;
+        background-color: #6c85a3;
+        overflow-x: hidden;
+        transition: 0.5s;
+    }
+
+    .sidenav a {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 15px;
+        color: #fff;
+        display: block;
+        transition: 0.3s;
+    }
+
+    .sidenav a:hover {
+        color: #333;
+    }
+
+
+    @@media screen and (max-height: 450px) {
+        .sidenav {padding-top: 15px;}
+        .sidenav a {font-size: 18px;}
+    }
+
+    
+/*Show Candidate Styling*/
+@@import url('https://fonts.googleapis.com/css?family=Montserrat');
+
+* {
+	box-sizing: border-box;
+}
+h3 {
+	margin: 10px 0;
+}
+
+h6 {
+	margin: 5px 0;
+	text-transform: uppercase;
+}
+
+p {
+	font-size: 14px;
+	line-height: 21px;
+}
+
+.card-container {
+    font-family: Montserrat, sans-serif;
+	background-color: #231E39;
+	
+	box-shadow: 0px 10px 20px -10px rgba(0,0,0,0.75);
+	color: #B3B8CD;
+	padding: 30px;
+	width: 100%;
+	max-width: 100%;
+	text-align: center;
+    height: 100%;
+}
+.details-container{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-column-gap: 10px;
+    max-height: 68%;
+    overflow: fragments;
+    
+    
+}
+
+.card-container .pro {
+	color: #231E39;
+	background-color: #FEBB0B;
+	border-radius: 3px;
+	font-size: 14px;
+	font-weight: bold;
+	padding: 3px 7px;
+	position: absolute;
+	top: 30px;
+	left: 30px;
+}
+
+.card-container .round {
+	border: 1px solid #03BFCB;
+	border-radius: 50%;
+	padding: 7px;
+}
+
+button.primary {
+	background-color: #03BFCB;
+	border: 1px solid #03BFCB;
+	border-radius: 3px;
+	color: #231E39;
+	font-family: Montserrat, sans-serif;
+	font-weight: 500;
+	padding: 10px 25px;
+}
+
+button.primary.ghost {
+	background-color: transparent;
+	color: #02899C;
+}
+
+.skills {
+	background-color: rgb(41, 51, 63, 0.8);
+	text-align: left;
+	padding: 15px;
+	margin-top: 10px;
+}
+
+.skills ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+.skills ul li {
+	border: 1px solid #2D2747;
+	border-radius: 2px;
+	display: inline-block;
+	font-size: 12px;
+	margin: 0 7px 7px 0;
+	padding: 7px;
+}
+
+.value{
+	border: 1px solid #03BFCB;
+	border-radius: 2px;
+	font-size: 12px;
+	margin: 0 7px 7px 0;
+	padding: 7px;
+	
+}
+/* /Show Candidate Styling*/
+
+
+/*Form Styling start*/
+
+.popup-wrapper{
+position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+}
+
+.form-wrapper {
+    font-family: 'Balsamiq Sans', sans-serif;
+    background: #231E39;
+    width: 100%;
+    padding: 30px 90px 90px 90px;
+    border: 6px solid rgba(0, 0, 0, 0.3);
+    box-shadow: 20px 20px 0 rgba(0, 0, 0, 0.3);
+    border-radius: 50px;
+    position: relative;
+}
+
+.form-wrapper h2 {
+    color: white;
+    /*font-size: 60px;*/
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.form-wrapper .row {
+    width: 100%;
+    display: grid;
+    /*grid-template-columns: repeat(auto-fit,minmax(40%, 1fr));*/
+    grid-template-columns: repeat(2, minmax(50%, 1fr));
+
+}
+
+.form-wrapper .row .col {
+    position: relative;
+    width: 100%;
+    margin: 10px 20px 40px 0;
+    transition: 0.5s;
+}
+
+.form-wrapper .row .form-group {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    color: #ffffff;
+}
+
+/*These hide the weird up/down arrow */
+.in::-webkit-outer-spin-button,
+.in::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.in[type=number] {
+    -moz-appearance: textfield;
+}
+
+.in,
+ select
+{
+    outline: none;
+    /*font-size: 20px;*/
+    padding: 10px 0 10px 20px;
+    border: 5px solid rgba(3, 191, 203, 0.5);
+    /*box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.3);
+    *background: rgba(0, 0, 0, 0.3);
+    */
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+    background: transparent;
+    color: white;
+    border-radius: 10px;
+    
+}
+.in-small{
+    width: 100%;
+    outline: none;
+    /*font-size: 20px;*/
+    padding: 10px 0 10px 20px;
+    border: 5px solid rgba(3, 191, 203);
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+    font-weight: 700;
+    color: black;
+    border-radius: 10px;
+}
+.form-wrapper .row .form-group label {
+    color: #ffffff;
+    /*font-size: 24px;*/
+    margin: 0 0 0 10px;
+    display: block;
+    pointer-events: none;
+}
+
+.form-wrapper .row .form-group h2 {
+    /*font-size: 20px;*/
+    color: white;
+    text-transform: capitalize;
+    width: 30%;
+    margin-right: 10%;
+}
+
+.check {
+    color: green;
+
+}
+
+/*.row .col:nth-child(6) {
+    margin-top: 64px;
+}*/
+
+.form-wrapper .row .col .form-group .border:focus {
+    border: 5px solid #ffffff;
+    transition: all 0.3s;
+}
+
+label{
+font-weight: 600;
+text-transform: uppercase;
+text-decoration: blink;
+}
+.in{
+font-weight: 700;
+}
+    option {
+        background: #6c85a3;
+        color: whitesmoke;
+        margin: 10px;
+    }
+
+.in[type="submit"] {
+    border-bottom: 5px solid rgba(0, 0, 0, 0.3);
+    box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    height: 100%;
+    width: 100%;
+    cursor: pointer;
+    outline: none;
+    background: transparent;
+    text-transform: uppercase;
+    color: #ffffff;
+    line-height: 40px;
+    font-size: 24px;
+    font-weight: 700;
+    border-radius: 45px;
+    transition: all 0.4s;
+    grid-column-start: span 2;
+}
+
+.in:hover {
+    border: 5px solid rgba(255, 255, 255, 1);
+    color: #ffffff;
+    transition: all 0.5s;
+
+}
+
+fieldset {
+    box-shadow: rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px;
+}
+
+.form-wrapper .row legend {
+    background: #6c85a3;
+    color: white;
+}
+
+.form-wrapper .row .check .in[type="checkbox"] {
+    height: 70%;
+}
+/* /Form Styling start*/
+</style>
+
+<div class="wrapper">
+
+    <div id="testNav" class="sidenav">
+
+        <a href="javascript:void(0)" class="closebtn" style="font-size: 36px;" @onclick="CloseMenu">&times;</a>
+        <a href="/profile" class="mb-2">@State.UserEmail</a>
+        <a href="#">Home</a>
+        <a href="#">Analytical Dashboard</a>
+        <a href="#">Job Board</a>
+        <a href="/testlogout">Logout</a>
+
+        <hr style="width:90%; margin:0 auto" />
+
+        @* <a href="javascript:void(0)" @onclick="@us1Action">Department Analysis</a>
+            <a href="javascript:void(0)" @onclick="@us2Action">Rate of Registration</a>
+            <a href="javascript:void(0)" @onclick="@us3Action">Site Traffic</a>
+            <a href="javascript:void(0)" @onclick="@us4Action">Time to Fill</a>
+            <a href="javascript:void(0)" @onclick="@us5Action">Time to Hire</a> *@
+
+    </div>
+
+    <div class="nav">
+
+        <div class="nav-title">
+            <h5 style="color:#fff;">Xebec Platform</h5>
+        </div>
+
+        <div class="nav-icons">
+
+
+            <span style="font-size:30px;cursor:pointer; color:#fff" @onclick="ShowMenu">&#9776;</span>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="main-body">
+
+        <!--BEGIN NEW CONTENT-->
+        <!--Dropdown -->
+        <header class="" style="height: 10vh;width: 100%;">
+            <div class="report-buttons">
+                <label for="phase" class="col-sm-3 label">Department</label>
+                <select class="app-form-control" id="phase">
+                    <option selected>Select Department</option>
+                    <option value="Administration">Administration</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="Finance">Finance</option>
+                    <option value="IT">IT</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Research">Research</option>
+                    <option value="Sales">Sales</option>
+                </select>
+            </div>
+
+            <div class="report-buttons">
+                <label for="status" class="col-sm-3 label">Job</label>
+                <select class="app-form-control" id="status">
+                    <option selected>Select Job</option>
+                    <option value="Administration">Administration</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="Finance">Finance</option>
+                    <option value="IT">IT</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Research">Research</option>
+                    <option value="Sales">Sales</option>
+                </select>
+            </div>
+    
+    </header>
+    <!--/Dropdown -->
+    <!--Show Idea Candidate-->
+
+    <section class="" style="height: 80vh; width: 100%;">
+        <div class="card-container">
+
+            <img width="60" class="round" src="https://randomuser.me/api/portraits/lego/3.jpg" alt="user" />
+            <h3>The Ideal Candidate</h3>
+            <h6>xx: Department</h6>
+            <p>xx:job-applied</p>
+            <div class="buttons">
+                <button class="primary">
+                    Save
+                </button>
+                <button class="primary ghost" @onclick="ShowPopUp">
+                    Edit
+                </button>
+            </div>
+            <div class="details-container">
+
+                <div class="skills">
+                    <h6>Salary Expection <span class="value">Rxx</span></h6>
+
+                </div>
+                <div class="skills">
+                    <h6>Availability (Start Date) <span class="value">xx/xx/xxxx</span></h6>
+                </div>
+
+                <div class="skills">
+                    <h6>Notice (Weeks) <span class="value">xx</span></h6>
+                </div>
+
+                <div class="skills">
+                    <h6>Experience <span class="value">xx</span></h6>
+                </div>
+
+                <div class="skills">
+                    <h6>University <span class="value">xxxxx</span></h6>
+                </div>
+                <div class="skills">
+                    <h6>Platform <span class="value">xxxxx</span></h6>
+                </div>
+
+                <div class="skills">
+                    <h6>Citizen <span class="value">xxxx</span></h6>
+                </div>
+
+                <div class="skills">
+                    <h6>Work Permit <span class="value">Rxx</span></h6>
+                </div>
+
+                <div class="skills">
+                    <h6>Visa <span class="value">Rxx</span></h6>
+                </div>
+
+                <div class="skills">
+                    <h6>Expectation <span class="value">Rxx</span></h6>
+                </div>
+            </div>
+
+
+
+
+            <!--
+            <div class="skills">
+                    <h6>Skills</h6>
+                    <ul>
+                        <li>UI / UX</li>
+                        <li>Front End Development</li>
+                        <li>HTML</li>
+                        <li>CSS</li>
+                        <li>JavaScript</li>
+                        <li>React</li>
+                        <li>Node</li>
+                    </ul>
+                </div>
+            -->
+        </div>
+
+    </section>
+
+    <!--/Show Idea Candidate-->
+    <!--Edit Ideal Candidate (Pop up)-->
+
+    <section class="popup-wrapper" style="display: @PopupDisplay ;">
+        <div class="form-wrapper">
+            <h2>Ideal candidate <span @onclick="ClosePopUp">Close</span></h2>
+            <EditForm Model="@TempIdealCandidate" OnValidSubmit="@HandleValidSubmit">
+                <div class="row">
+
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Salary Expectation</label>
+
+                            <div class="input-group row col-12 col-12">
+                                <InputNumber @bind-Value="TempIdealCandidate.SalaryExpectation" class="in col-12" />
+                                <div class="input-group-append col-4">
+                                    <InputNumber @bind-Value="TempIdealCandidate.SalaryImportance" class="form-control in-small" />
+                                </div>
+                            </div>
+                            <!--class="col-8"-->
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Available Start Date</label>
+                            <div class="input-group row col-12">
+                                <InputDate @bind-Value="TempIdealCandidate.Availability" class="in col-12" />
+                                <div class="input-group-append col-4">
+                                    <InputNumber @bind-Value="TempIdealCandidate.StartDateImportance" class="form-control in-small" />
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Notice (weeks)</label>
+                            <div class="input-group row col-12">
+                                <InputNumber @bind-Value="TempIdealCandidate.Notice" class="in col-12" />
+                                <div class="input-group-append col-4">
+                                    <InputNumber @bind-Value="TempIdealCandidate.NoticeImportance" class="form-control in-small" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Experience (years)</label>
+
+                            <div class="input-group row col-12">
+                                <InputNumber @bind-Value="TempIdealCandidate.Experience" class="in col-12" />
+                                <div class="input-group-append col-4">
+                                    <InputNumber @bind-Value="TempIdealCandidate.ExperienceImportance" class="form-control in-small" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>University</label>
+                            <div class="input-group row col-12">
+                                <InputText @bind-Value="TempIdealCandidate.University" class="in col-12" />
+                                <div class="input-group-append col-4">
+                                    <InputNumber @bind-Value="TempIdealCandidate.UniversityImportance" class="form-control in-small" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Platform</label>
+
+
+                            <div class="input-group row col-12">
+                                <InputSelect @bind-Value="TempIdealCandidate.Platform" class="app-form-control" id="platform">
+                                    <option selected disabled>Select Platform</option>
+                                    <option value="LinkedIn">LinkedIn</option>
+                                    <option value="PNet">PNET</option>
+                                    <option value="Xebec">Xebec</option>
+                                </InputSelect>
+                                <div class="input-group-append col-4">
+                                    <InputNumber @bind-Value="TempIdealCandidate.PlatformImportance" class="form-control in-small" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>SA Citizen</label>
+                            <div class="input-group row col-12">
+                                <InputSelect @bind-Value="TempIdealCandidate.Citizenship" class="app-form-control" id="citizenship">
+                                    <option selected disabled>Yes or No</option>
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
+                                </InputSelect>
+                                <div class="input-group-append col-4">
+                                    <InputNumber @bind-Value="TempIdealCandidate.CitizenshipImportance" class="form-control in-small" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Work Permit</label>
+
+
+                            <div class="input-group row col-12">
+                                <InputSelect @bind-Value="TempIdealCandidate.Permit" class="app-form-control" id="permit">
+                                    <option selected disabled>Yes or No</option>
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
+                                </InputSelect>
+                                <div class="input-group-append col-4">
+                                    <InputNumber @bind-Value="TempIdealCandidate.PermitImportance" class="form-control in-small" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Visa</label>
+
+
+                            <div class="input-group row col-12">
+                                <InputSelect @bind-Value="TempIdealCandidate.Visa" class="app-form-control" id="visa">
+                                    <option selected disabled>Yes or No</option>
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
+                                </InputSelect>
+                                <div class="input-group-append col-4">
+                                    <InputNumber @bind-Value="TempIdealCandidate.VisaImportance" class="form-control in-small" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <input class="in col-12" type="submit" value="Submit">
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </section>
+
+    <!--/Edit Ideal Candidate (Pop up)-->
+    <!--END NEW CONTENT-->
+
+
+</div>
+
+
+    <div class="footer-container">
+
+        <span>Nebula 2021 &reg;</span>
+
+    </div>
+
+</div>
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("initalizeSlideOutNav");
+        }
+    }
+
+    private async Task ShowMenu()
+    {
+        await jsRuntime.InvokeVoidAsync("openNav");
+    }
+
+    private async Task CloseMenu()
+    {
+        await jsRuntime.InvokeVoidAsync("closeNav");
+    }
+
+
+
+}

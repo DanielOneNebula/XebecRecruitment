@@ -1,0 +1,552 @@
+@page "/candidateinfoprimary/{JobId}"
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+@inject HttpClient httpClient
+@inject State State
+@using XebecPortal.Shared.Security
+
+@*TODO: ADD MAX AND MIN WIDTHS TO MAIN DIV*@
+
+<style>
+
+    @@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800&display=swap');
+
+    * {
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .wrapper {
+        height: 100vh;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .nav {
+        height: 8vh;
+        background-color: #00BCAE;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 0.8rem;
+        box-shadow: rgba(0, 0, 0, 0.2) 0px 12px 28px 0px, rgba(0, 0, 0, 0.1) 0px 2px 4px 0px, rgba(255, 255, 255, 0.05) 0px 0px 0px 1px inset;
+    }
+
+    .main-body {
+        height: 86vh;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        @* background-color: pink; *@
+    }
+
+    /*FOOTER*/
+    .footer-container {
+        width: 100%;
+        height: 6vh;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        background-color: #00BCAE;
+        color: #fff;
+    }
+
+    .footer-container span {
+        font-size: 13px;
+        font-weight: bold;
+        margin-right: 2rem;
+    }
+
+    .sidenav {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        right: 0;
+        background-color: #00BCAE;
+        overflow-x: hidden;
+        transition: 0.5s;
+    }
+
+    .sidenav a {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 15px;
+        color: #fff;
+        display: block;
+        transition: 0.3s;
+    }
+
+    .sidenav a:hover {
+        color: #333;
+    }
+
+    @@media screen and (max-height: 450px) {
+        .sidenav {padding-top: 15px;}
+        .sidenav a {font-size: 18px;}
+    }
+
+    @*Start Component Style*@
+
+   .profile-wrapper {
+        width: 100%;
+        height: 100%;
+        background-color: #f5f5f5;
+        flex-grow: 1;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: flex-start;
+        overflow: auto;
+        min-height: 0;
+    }
+
+.profile-wrapper::-webkit-scrollbar {
+  width: 0.5em;
+}
+
+.profile-wrapper::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+.profile-wrapper::-webkit-scrollbar-thumb {
+  background-color: #a9baba;
+}
+
+    .left, .right {
+        width: 46%;
+        height: 100%;
+        margin: auto;
+        display: flex;
+        justify-content: center;
+    }
+
+    .content {
+        width: 100%;
+        height: fit-content;
+        background-color: #fff;
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 5px;
+        max-width: 550px;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    }
+
+/*loading test*/
+.spinner {
+    border: 16px solid silver;
+    border-top: 16px solid #337AB7;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spin 700ms linear infinite;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    z-index: 20;
+}
+
+@@keyframes spin {
+    0% {
+        transform: rotate(0deg)
+    }
+
+    100% {
+        transform: rotate(360deg)
+    }
+}
+
+.search-bar-container
+{
+    width: 100%;
+    height: 80px;
+    background-color: rgba(0, 188, 174, 0.5);
+    margin-top: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;,\
+
+}
+
+.search-bar-container .searchbar{
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.search-bar-container .searchbar input{
+    font-size: 14px;
+    margin-left: 5px;
+    border-radius: 5px;
+    padding: 4px 10px;
+    outline: none;
+    border: 0.3px solid #6c85a3;
+}
+
+.search-bar-container .searchbar select{
+    font-size: 14px;
+    margin-left: 5px;
+    border-radius: 5px;
+    padding: 4px 12px;
+    outline: none;
+    border: 0.3px solid #6c85a3;
+}
+
+.left-search
+{
+    display: flex;
+    margin-top: 22px;
+}
+@* .personal{
+    border: 0.5px solid #fff;
+    transition: all 0.5s ease;
+}
+.personal:hover{
+    border: 0.5px solid #6c85a3;
+} *@
+
+.header-container{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.select-details
+{
+    overflow-y: auto;
+    padding: 10px;
+}
+
+   @*End Component Style*@
+</style>
+
+<div class="wrapper">
+
+    <div id="testNav" class="sidenav">
+        <a href="javascript:void(0)" style="font-size: 36px;" class="closebtn" @onclick="CloseMenu">&times;</a>
+        <a href="/profile_" class="mb-2">@State.UserEmail</a>
+        <a href="/">Home</a>
+        <a href="/data-analytics-tool">Analytical Dashboard</a>
+        <a href="/testlogout">Logout</a>
+
+        <hr style="width:90%; margin:0 auto" />
+
+        <a href="/jobboard">View Jobs</a>
+        <a href="/jobposting">View Posted Jobs</a>
+        <a href="/addpostsub">Post a Job</a>
+    </div>
+
+    <div class="nav">
+
+        <div class="nav-title">
+            <h5 style="color:#fff;">Xebec Platform</h5>
+        </div>
+
+        <div class="nav-icons">
+
+            <span style="font-size:30px;cursor:pointer; color:#fff;" @onclick="ShowMenu">&#9776;</span>
+        </div>
+    </div>
+
+    <div class="main-body">
+
+        <!--Start Component-->
+        <div class="search-bar-container">
+
+            <div class="searchbar">
+                <div class="left-search">
+
+                    <div class="searchTitle">
+                        <span><input type="text" placeholder="Search Item"></span>
+                    </div>
+                    <div class="searchLocation">
+                        <span><input type="text" placeholder="Secondary Search Item"></span>
+                    </div>
+                    <div style="padding-bottom: 25px; padding-left: 15px;">
+                        <span><button class="btn searchButton btn-info btn-sm" @onclick="RealSearch">Search</button></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-wrapper">
+
+            <div class="left">
+
+                <div class="personal content">
+
+                    <table class="table table-sm table table-bordered table-dark">
+                        <thead>
+                            <tr>
+                                <th class="text-center" scope="col">#</th>
+                                <th class="text-center" scope="col">Full Name</th>
+                                <th class="text-center" scope="col">Phase</th>
+                                <th class="text-center" scope="col">Change status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @if (RealCandidatesInfo != null && RealCandidatesInfo.Count > 0)
+                            {
+                                int num = 1;
+                                @for (int i = 0; i < RealCandidatesInfo.Count; i++)
+                                {
+                                    var candidate = RealCandidatesInfo[i];
+                                    <tr @onclick="() => ChangeCurrent(candidate)" id=@($"{(candidate.Id)}")>
+                                        <td class="text-center" scope="row">@(num++)</td>
+                                        <td class="text-center" scope="row">@candidate.FirstName @candidate.LastName</td>                                      
+                                        <td class="text-center" scope="row">@applicationPhases[i % 4].Description</td>
+                                        <td class="text-center" scope="row">
+                                            <a><i class="fa fa-edit"></i></a>
+                                        </td>
+                                    </tr>
+
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="right">
+
+                <div class="content">
+
+                    <div class="select-details">
+                        @if (RealUserPersonalInfo != null)
+                        {
+                            <img src="/img/Guy.png" alt="" width="70" lass="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
+                            <h5 class="mb-0 mt-2">@RealUserPersonalInfo.FirstName @RealUserPersonalInfo.LastName</h5>
+                            <hr />
+                            <span class="small text-uppercase text-muted">Gender</span>
+                            <hr>
+                            <span class="small text-uppercase text-muted">Contact Info</span>
+                            <p><span class="small text-uppercase text-muted">Phone Number:</span> @RealUserPersonalInfo.PhoneNumber</p>
+                            <p><span class="small text-uppercase text-muted">Address:</span> @RealUserPersonalInfo.Address</p>
+                            <hr>
+                            <div>
+                                <span class="small text-uppercase text-muted">APPLICATION STATUS</span>
+                                <br />
+                                @applicationPhases[0].Description (@statuses[0].Description)
+                                @*<ProgressBarComp />*@
+                            </div>
+                            <hr />
+                            <span class="small text-uppercase text-muted">More Info</span>
+                            <p>@applicationPhaseHelpers[0].Comments</p>
+                            @*<p>@CurrentCandidate.ExtraInfo</p>*@
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--End Component-->
+
+    <div class="footer-container">
+
+        <span>Nebula 2021 &reg;</span>
+    </div>
+</div>
+
+@code
+{
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        await jsRuntime.InvokeVoidAsync("initalizeSlideOutNav");
+        base.OnAfterRender(firstRender);
+    }
+    private async Task ShowMenu()
+    {
+        await jsRuntime.InvokeVoidAsync("openNav");
+    }
+
+    private async Task CloseMenu()
+    {
+        await jsRuntime.InvokeVoidAsync("closeNav");
+    }
+
+    public ApplicationPhaseHelper TempPhaseHelper { get; set; } = new ApplicationPhaseHelper();
+
+    private List<AppUser> RealCandidates { get; set; } = new List<AppUser>();
+
+    private AppUser RealUser { get; set; }
+    private List<PersonalInformation> RealCandidatesInfo { get; set; }
+    private PersonalInformation RealUserPersonalInfo { get; set; }
+    private List<WorkHistory> RealUserExperience { get; set; }
+    private List<Education> RealUserEducation { get; set; }
+    private List<ApplicationPhase> applicationPhases { get; set; }
+    private List<ApplicationPhaseHelper> applicationPhaseHelpers { get; set; }
+    private List<Status> statuses { get; set; }
+    private ApplicationPhaseHelper displayAPH { get; set; }
+
+    [Parameter]
+    public string JobId { get; set; }
+
+    #region Component LifeCycles
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        try
+        {
+            RealCandidates = await httpClient.GetFromJsonAsync<List<AppUser>>($"api/CandidateTest/?JobId={JobId}");
+            applicationPhases = await httpClient.GetFromJsonAsync<List<ApplicationPhase>>("api/ApplicationPhase");
+            applicationPhaseHelpers = await httpClient.GetFromJsonAsync<List<ApplicationPhaseHelper>>("api/ApplicationPhaseHelper");
+            statuses = await httpClient.GetFromJsonAsync<List<Status>>("api/Status");
+
+            if (RealCandidates.Count > 0)
+            {
+                Console.WriteLine("we made it here");
+                RealCandidatesInfo = await httpClient.GetFromJsonAsync<List<PersonalInformation>>($"api/PersonalInformation/candidates/{JobId}");
+            }
+            if (RealCandidatesInfo.Count > 0)
+            {
+                RealUserPersonalInfo = RealCandidatesInfo[0];
+                @* CurrentCandidate = Candidates[0]; *@
+            }
+
+        }
+        catch (Exception ex)
+        {
+            RealCandidates = new List<AppUser>();
+            RealCandidatesInfo = new List<PersonalInformation>();
+        }
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("initialize");  //Calls the initialize function from the javascript file.
+        }
+        @* if (Candidates.Count > 0)
+            {
+                CurrentCandidate = Candidates[0];
+            } *@
+    }
+    #endregion Component LifeCycles
+
+    private void ChangeCurrent(PersonalInformation newcandidate)
+    {
+        RealUserPersonalInfo = newcandidate;
+    }
+
+    #region Searching and Filtering
+    //Search query parameters
+    private string SearchTerm { get; set; } = string.Empty;
+    private string DisabilityFilter { get; set; } = string.Empty;
+    private string EthnicFilter { get; set; } = string.Empty;
+    private string GenderFilter { get; set; } = string.Empty;
+
+    //boolean filtering checkers
+    private bool EthnicFilterApplied = false;
+    private bool GenderFilterApplied = false;
+    private bool DisabilityFilterApplied = false;
+
+    private List<PersonalInformation> SearchedCandidates { get; set; } = new List<PersonalInformation>();
+
+    private void onValChanged(Microsoft.AspNetCore.Components.ChangeEventArgs args)
+    {
+        switch (args.Value.ToString())
+        {
+            case "Black":
+                EthnicFilter = args.Value.ToString();
+                EthnicFilterApplied = true;
+                break;
+            case "White":
+                EthnicFilter = args.Value.ToString();
+                EthnicFilterApplied = true;
+                break;
+            case "Indian":
+                EthnicFilter = args.Value.ToString();
+                EthnicFilterApplied = true;
+                break;
+            case "Coloured":
+                EthnicFilter = args.Value.ToString();
+                EthnicFilterApplied = true;
+                break;
+            case "Male":
+                GenderFilter = args.Value.ToString();
+                GenderFilterApplied = true;
+                break;
+            case "Female":
+                GenderFilter = args.Value.ToString();
+                GenderFilterApplied = true;
+                break;
+            case "disabled":
+                DisabilityFilter = args.Value.ToString();
+                DisabilityFilterApplied = true;
+                break;
+            case "abled":
+                DisabilityFilter = args.Value.ToString();
+                DisabilityFilterApplied = true;
+                break;
+            default:
+                break;
+        }
+        SearchEvent();
+    }
+
+    //Clear Methods
+    private void ClearEthnic()
+    {
+        EthnicFilterApplied = false;
+        EthnicFilter = string.Empty;
+        SearchEvent();
+    }
+    private void ClearGender()
+    {
+        GenderFilterApplied = false;
+        GenderFilter = string.Empty;
+        SearchEvent();
+    }
+    private void ClearDisability()
+    {
+        DisabilityFilterApplied = false;
+        DisabilityFilter = string.Empty;
+        SearchEvent();
+    }
+
+    private void RealSearch()
+    {
+
+        SearchEvent();
+
+    }
+
+    private async Task<List<PersonalInformation>> SearchEvent()
+    {
+
+        try
+        {
+            RealCandidates = await httpClient.GetFromJsonAsync<List<AppUser>>($"api/CandidateTest/?JobId={int.Parse(JobId)}");
+        }
+        catch (Exception ex)
+        {
+            RealCandidates = new List<AppUser>();
+        }
+
+        if (RealCandidates.Count > 0)
+        {
+            SearchedCandidates = await httpClient.GetFromJsonAsync<List<PersonalInformation>>($"api/CandidateTest/candidates/?Job={JobId}&SearchQuery={SearchTerm}&ethnicityFiler={EthnicFilter}&GenderFilter={GenderFilter}&disabilityFilter={DisabilityFilter}");
+        }
+
+        if (SearchedCandidates.Count > 0)
+        {
+            RealUserPersonalInfo = SearchedCandidates[0];
+        }
+        RealCandidatesInfo = SearchedCandidates;
+        InvokeAsync(StateHasChanged);
+        return RealCandidatesInfo;
+    }
+
+    #endregion
+
+}

@@ -1,0 +1,26 @@
+@inherits LayoutComponentBase
+@inject IJSRuntime jsRuntime
+@inject State State
+
+<div class="page">
+   @Body
+</div>
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        var userdata = await jsRuntime.InvokeAsync<string>("localStorage.getItem", "user").ConfigureAwait(false);
+        if (!string.IsNullOrWhiteSpace(userdata))
+        {
+            string[] userdetails = userdata.Split(';');
+            State.UserEmail = userdetails[0];
+            State.Role = userdetails[1].ToLower();
+            State.Id = Int32.Parse(userdetails[3]);          
+
+        }
+
+        
+    }
+}

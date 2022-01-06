@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>XebecPortal</title>
+    <base href="/" />
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/app.css" rel="stylesheet" />
+    <link href="XebecPortal.Client.styles.css" rel="stylesheet" />
+    <link href="manifest.json" rel="manifest" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <link href="XebecPortal.Client.styles.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <script src="jquery/jquery.js"></script>
+
+    <!--Gamified Phase Four-->
+    <script
+      src="https://kit.fontawesome.com/64d58efce2.js"
+      crossorigin="anonymous"
+    ></script>
+    
+    <!--Select2-->
+    <link href="select2/css/select2.css" rel="stylesheet" />
+    <script src="select2/js/select2.js"></script>
+</head>
+
+<body>
+    <div id="app">Loading...</div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+
+    <script src="_framework/blazor.webassembly.js"></script>
+
+    <script src="js/test.js"></script>
+    <script src="js/JobPostingTest.js"></script>
+    <script src="_content/BlazorInputFile/inputfile.js"></script>   
+
+
+    <!--These are Gamification Application scripts that are being called-->
+    <script src="js/GamifiedApplication/AdditionalInfoP3.js"></script>
+    <script src="js/GamifiedApplication/PersonalDetailsP3.js"></script>
+    <script src="js/GamifiedApplication/EducationFormP3.js"></script>
+    <script src="js/GamifiedApplication/WorkHistoryForm.js"></script>
+
+    <!--Gamification Phase four-->
+    <script src="js/loginstyle.js"></script>
+
+    
+
+    <!--New Script tags go here-->
+    <script src="js/tempNav.js"></script>
+    <script src="js/GamifiedApplication/animatedProgressNew.js"></script>
+    
+    <script>
+        var slider = document.getElementById("myRange");
+        var output = document.getElementById("demo");
+        output.innerHTML = slider.value; // Display the default slider value
+
+        // Update the current slider value (each time you drag the slider handle)
+        slider.oninput = function () {
+            output.innerHTML = this.value;
+        }
+
+    </script>
+
+    <!--For icons-->
+    <script src="https://code.iconify.design/2/2.0.3/iconify.min.js"></script>
+    <script src="js/select2Styling.js"></script>
+
+    <script>navigator.serviceWorker.register('service-worker.js');</script>
+    
+    
+</body>
+
+</html>
+
+

@@ -1,0 +1,144 @@
+@page "/CandidateStatus"
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+@inject HttpClient client
+@inject State State
+@*TODO: ADD MAX AND MIN WIDTHS TO MAIN DIV*@
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800&display=swap');
+
+    * {
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .wrapper {
+        height: 100vh;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .nav {
+        height: 8vh;
+        background-color: #00BCAE;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 0.8rem;
+        box-shadow: rgba(0, 0, 0, 0.2) 0px 12px 28px 0px, rgba(0, 0, 0, 0.1) 0px 2px 4px 0px, rgba(255, 255, 255, 0.05) 0px 0px 0px 1px inset;
+    }
+
+    .main-body {
+        height: 86vh;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: lightgray;
+    }
+
+    /*FOOTER*/
+    .footer-container {
+        width: 100%;
+        height: 6vh;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        background-color: #00BCAE;
+        color: #fff;
+    }
+
+    .footer-container span {
+        font-size: 13px;
+        font-weight: bold;
+        margin-right: 2rem;
+    }
+
+    .sidenav {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        right: 0;
+        background-color: #00BCAE;
+        overflow-x: hidden;
+        transition: 0.5s;
+    }
+
+    .sidenav a {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 15px;
+        color: #fff;
+        display: block;
+        transition: 0.3s;
+    }
+
+    .sidenav a:hover {
+        color: #333;
+    }
+
+    @@media screen and (max-height: 450px) {
+        .sidenav {padding-top: 15px;}
+        .sidenav a {font-size: 18px;}
+    }
+</style>
+
+<div class="wrapper">
+
+    <div id="testNav" class="sidenav">
+        <a href="javascript:void(0)" style="font-size: 36px;" class="closebtn" @onclick="CloseMenu">&times;</a>
+        <a href="/profile_" class="mb-2">@State.UserEmail</a>
+        <a href="/">Home</a>
+        <a href="/data-analytics-tool">Analytical Dashboard</a>
+        <a href="/testlogout">Logout</a>
+
+        <hr style="width:90%; margin:0 auto" />
+
+        <a href="/jobboard">View Jobs</a>
+        <a href="/jobposting">View Posted Jobs</a>
+        <a href="/addpostsub">Post a Job</a>
+    </div>
+
+    <div class="nav">
+
+        <div class="nav-title">
+            <h5 style="color:#fff;">Xebec Platform</h5>
+        </div>
+
+        <div class="nav-icons">
+
+            <span style="font-size:30px;cursor:pointer; color:#fff;" @onclick="ShowMenu">&#9776;</span>
+        </div>
+    </div>
+
+    <div class="main-body">
+        <CandidateStatusSubComponent />
+    </div>
+
+    <div class="footer-container">
+
+        <span>Nebula 2021 &reg;</span>
+    </div>
+</div>
+
+@code
+{
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        await jsRuntime.InvokeVoidAsync("initalizeSlideOutNav");
+        base.OnAfterRender(firstRender);
+    }
+    private async Task ShowMenu()
+    {
+        await jsRuntime.InvokeVoidAsync("openNav");
+    }
+
+    private async Task CloseMenu()
+    {
+        await jsRuntime.InvokeVoidAsync("closeNav");
+    }
+}

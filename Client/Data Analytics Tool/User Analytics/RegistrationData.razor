@@ -1,0 +1,87 @@
+﻿@page "/registration"
+<style>
+    .report {
+        width: 95%;
+        height: 95%;
+        margin: auto;
+        display: flex;
+    }
+
+    .report-container {
+        width: 95%;
+        height: 100%;
+    }
+
+    iframe {
+        border-radius: 5px;
+        height: 100%;
+        width: 100%;
+    }
+
+    .enlarge-iframe-div {
+        height: 50px;
+        width: 5%;
+        text-align: center;
+        margin-top: 0;
+    }
+
+    .big {
+        height: 88vh;
+        width: 100%;
+        background-color: black;
+        position: absolute;
+        z-index: 1;
+        margin-top: -12vh;
+        display: flex;
+    }
+    .big-main {
+        height: 90%;
+        margin-top: 2.5%;
+        margin-bottom: 5%;
+        width: 90%;
+        margin-left: 5%;
+    }
+
+    .compress-iframe-div {
+        height: 5%;
+        justify-content: center;
+        justify-items: center;
+        align-content: center;
+        align-items: center;
+        margin: auto;
+        width: 5%;
+        text-align: center;
+    }
+</style>
+
+<div class="report">
+
+    <div class="report-container">
+        <iframe src="https://app.powerbi.com/reportEmbed?reportId=4f4559ec-f3c1-4bc7-860d-b4d47ac134a7&groupId=e7de2534-90ca-418d-8fec-ce9ef17c3cb6&autoAuth=true&ctid=8f4b998c-dd4c-4bb0-b3cf-62b23831b6e6&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLW5vcnRoLWV1cm9wZS1yZWRpcmVjdC5hbmFseXNpcy53aW5kb3dzLm5ldC8ifQ%3D%3D" frameborder="0" allowFullScreen="true"></iframe>
+    </div>    
+    <div class="enlarge-iframe-div">
+        <i class="fas fa-expand-arrows-alt" style="color: ivory; font-size:20px;" @onclick="@Enlarge"></i>
+    </div>
+</div>
+<div hidden="@isHidden" class="big">
+    <div class="big-main">
+        <iframe src="https://app.powerbi.com/reportEmbed?reportId=4f4559ec-f3c1-4bc7-860d-b4d47ac134a7&groupId=e7de2534-90ca-418d-8fec-ce9ef17c3cb6&autoAuth=true&ctid=8f4b998c-dd4c-4bb0-b3cf-62b23831b6e6&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLW5vcnRoLWV1cm9wZS1yZWRpcmVjdC5hbmFseXNpcy53aW5kb3dzLm5ldC8ifQ%3D%3D" frameborder="0" allowFullScreen="true"></iframe>
+
+    </div>
+    <div class="compress-iframe-div">
+        <i class="fas fa-compress-arrows-alt" style="color: ivory; font-size:20px;" @onclick="@Shrink"></i>
+    </div>
+</div>
+
+@code{
+    private bool isHidden = true;
+
+    private void Enlarge()
+    {
+        isHidden = false;
+    }
+    private void Shrink()
+    {
+        isHidden = true;
+    }
+}

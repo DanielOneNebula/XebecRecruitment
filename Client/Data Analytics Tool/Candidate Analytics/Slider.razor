@@ -1,0 +1,53 @@
+﻿
+<div>
+    <p id="">@SliderValue</p>
+    @*<div class="slider-heading">
+        <span>@Min</span><span>@Max</span>
+    </div>*@
+    <input type="range" min="0" max="@Max" class="slider" @bind-value="SliderValue" @bind-value:event="oninput">
+</div>
+
+<style>
+    .slider-heading{
+        display: flex;
+        justify-content: space-between;
+    }
+
+    /* The slider itself */
+    .slider {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 15px;
+        border-radius: 5px;
+/*Trying to create progress bar effect*/
+        background: linear-gradient(90deg, green @(SliderValue)%, white @(SliderValue)%);
+        outline: none;
+        opacity: 0.6;
+        -webkit-transition: .2s;
+        transition: opacity .2s;
+        content:"x";
+    }
+    .slider:hover{
+        opacity: 1;
+    }
+
+        .slider::-webkit-slider-thumb {
+            content: "x";
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #04AA6D;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            content: "x";
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #04AA6D;
+            cursor: pointer;
+        }
+</style>

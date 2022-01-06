@@ -1,0 +1,244 @@
+@inject HttpClient HttpClient
+@inject State State
+
+<style>
+    @@importurl('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800&display=swap');
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .modal-wrapper {
+        width: 100%;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 10;
+        background-color: rgba(0, 0, 0, 0.9);
+    }
+
+    .upper button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    .lower {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-right: 10px;
+    }
+
+    /*form styles*/
+    .input-form {
+        background-color: #fff;
+        padding: 10px;
+        height: 90%;
+        width: 90%;
+        margin: auto;
+        max-width: 700px;
+        max-height: 600px;
+        display: flex;
+        flex-direction: column;
+        border-radius: 5px;
+        overflow-y: auto;
+        background-color: #283747;
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+    }
+
+        .input-form::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        .input-form::-webkit-scrollbar-track {
+            background-color: #EAF2F8;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+
+        .input-form::-webkit-scrollbar-thumb {
+            background-color: #95A5A6;
+            border: 3px solid #EAF2F8;
+            border-radius: 20px;
+        }
+
+    .inline {
+        width: 90%;
+        margin: auto;
+        display: flex;
+    }
+
+    .inline-inner {
+        width: 45%;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        font-size: 14px;
+        font-weight: bold;
+        margin-top: 1rem;
+        margin-bottom: 0px;
+        color: #fff;
+    }
+
+    .inline-inner input,
+    select {
+        padding: 5px 7px;
+        border-radius: 5px;
+        border: 0.5px solid #7C7C7C;
+        font-size: 13px;
+    }
+
+        .inline-inner input:focus,
+        select:focus,
+        .address-inner textarea:focus {
+            outline: none !important;
+            border: 1px solid #0077b6;
+            box-shadow: 0 0 10px #719ECE;
+        }
+
+    .address-inner {
+        width: 80%;
+    }
+
+        .address-inner textarea {
+            height: 150px;
+            padding: 5px 10px;
+            resize: none;
+            border-radius: 5px;
+            border: 0.5px solid #7C7C7C;
+        }
+
+    .btn-container,
+    .form-title {
+        padding: 1rem 0;
+        width: 90%;
+        margin: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .btn-close, .btn-save {
+        outline: none;
+        border: none;
+        transition: 0.3s;
+    }
+
+    .btn-close {
+        background-color: #ff4045;
+    }
+
+        .btn-close:hover, .btn-save:hover {
+            background-color: #cf2ec4;
+        }
+
+    .btn-save {
+        background-color: #698ad6;
+    }
+</style>
+
+<div class="modal-wrapper">
+
+    <div class="upper">
+        <button class="btn btn-danger btn-sm btn-close" @onclick="@(() => ToggleModal.InvokeAsync(Job))">Close</button>
+    </div>
+
+    <div class="lower">
+
+        <form class="input-form">
+
+            <div class="inline">
+
+                @* <div class="inline-inner">
+                        <label for="companyName">Company Name:</label>
+                    </div> *@
+
+                <div class="inline-inner">
+                    <label for="jobTitle">Job Title:</label>
+                    <input type="text" id="jobTitle" @bind="Job.Title">
+                </div>
+            </div>
+
+            <div class="inline">
+
+                <div class="inline-inner">
+                    <label for="location">Location:</label>
+                    <input type="text" id="location" @bind="Job.Location">
+                </div>
+
+                @* <div class="inline-inner">
+                    <label for="department">Department:</label>
+                    <input type="text" id="department" @bind="Job.Department">
+                </div> *@
+            </div>
+
+            <div class="inline">
+
+                <div class="inline-inner">
+                    <label for="dueDate">Due Date:</label>
+                    <input type="date" id="dueDate" @bind="Job.DueDate">
+                </div>
+
+                <div class="inline-inner">
+                    <label for="creationDate">Creation Date:</label>
+                    <input type="date" id="creationDate" @bind="Job.CreationDate">
+                </div>
+            </div>
+
+            <div class="inline">
+                <div class="inline-inner address-inner">
+                    <label for="description">Description:</label>
+                    <textarea id="description" @bind="Job.Description"></textarea>
+                </div>
+            </div>
+
+            <div class="btn-container">
+
+                <button type="button" class="btn btn-success btn-sm mt-2 btn-save" @onclick="Save">Save</button>
+                <p style="color:#fff;" class="mt-4 ml-3">@message</p>
+            </div>
+        </form>
+    </div>
+</div>
+
+@code{
+
+    [Parameter] public EventCallback<Job> ToggleModal { get; set; }
+
+    public Job Job { get; set; } = new Job();
+    string message = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+            Job = await HttpClient.GetFromJsonAsync<Job>($"api/job/{State.JobPostEditId}");
+
+        }
+        catch (Exception)
+        {
+
+            Job = new Job();
+
+        }
+
+    }
+
+    private async Task Save()
+    {
+        await HttpClient.PutAsJsonAsync($"api/job/{Job.Id}", Job);
+        message = "Saved";
+    }
+
+}

@@ -1,0 +1,448 @@
+@inject HttpClient httpClient
+@inject State State
+@inject IJSRuntime jsRuntime
+@inject NavigationManager NavManager
+
+<style>
+    .profile-wrapper {
+        width: 100%;
+        height: 100%;
+        background-color: #f5f5f5;
+        flex-grow: 1;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        overflow: auto;
+        min-height: 0;
+    }
+
+        .profile-wrapper::-webkit-scrollbar {
+            width: 0.5em;
+        }
+
+        .profile-wrapper::-webkit-scrollbar-track {
+            box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-wrapper::-webkit-scrollbar-thumb {
+            background-color: #a9baba;
+        }
+
+    .left {
+        width: 45%;
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-end;
+    }
+
+    .right {
+        width: 50%;
+        height: 100%;
+        margin: auto;
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+    }
+
+    .content {
+        width: 100%;
+        background-color: #fff;
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 5px;
+        max-width: 550px;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    }
+
+    .right .content {
+        max-width: 600px;
+        max-height: 400px;
+        padding: 15px;
+        font-size: 15px;
+        overflow-y: auto;
+    }
+
+        .right .content::-webkit-scrollbar {
+            width: 0;
+        }
+
+        .right .content::-webkit-scrollbar-thumb {
+            background-color: #fff;
+        }
+
+        .right .content ul {
+            margin: 5px 0 0 0;
+            padding: 0;
+        }
+
+            .right .content ul li {
+                list-style: none;
+                margin-bottom: 10px;
+                font-weight: bold;
+                color: green;
+            }
+
+    .document-type {
+        font-size: 13px;
+        margin-left: 10px;
+    }
+
+    .personal {
+        display: flex;
+        flex-direction: column;
+    }
+
+    h5 {
+        font-weight: bold;
+    }
+
+    .top {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid lightgray;
+    }
+
+    .bottom {
+        position: relative;
+        display: flex;
+        padding: 10px 5px;
+        margin: 0.8rem 0;
+    }
+
+    .image img {
+        max-width: 180px;
+        max-height: 180px;
+    }
+
+    .details {
+        width: 100%;
+        height: inherit;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 0 10px;
+    }
+
+        .details span {
+            font-size: 14px;
+            margin-bottom: 5px;
+            letter-spacing: 0.3px;
+        }
+
+    .education .details {
+        padding: 0;
+    }
+
+    .line {
+        width: 100%;
+        height: 1px;
+        background-color: #cad2dd;
+        margin: 1rem auto;
+    }
+
+    .btn-inline {
+        display: flex;
+    }
+
+    .icon-btn {
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .icon-btn:hover {
+            transform: scale(110%);
+        }
+
+        .icon-btn:active {
+            transform: scale(90%);
+        }
+
+    /*loading test*/
+    .spinner {
+        border: 16px solid silver;
+        border-top: 16px solid #337AB7;
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        animation: spin 700ms linear infinite;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        position: absolute;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg)
+        }
+
+        100% {
+            transform: rotate(360deg)
+        }
+    }
+
+    .search-bar-container {
+        width: 100%;
+        height: 80px;
+        background-color: rgba(0, 188, 174, 0.5);
+        margin-top: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+        .search-bar-container .searchbar {
+            width: 100%;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+        }
+
+            .search-bar-container .searchbar input {
+                font-size: 14px;
+                margin-left: 5px;
+                border-radius: 5px;
+                padding: 4px 10px;
+                outline: none;
+                border: 0.3px solid #6c85a3;
+            }
+
+            .search-bar-container .searchbar select {
+                font-size: 14px;
+                margin-left: 5px;
+                border-radius: 5px;
+                padding: 4px 12px;
+                outline: none;
+                border: 0.3px solid #6c85a3;
+            }
+
+    .left-search {
+        display: flex;
+        margin-top: 22px;
+    }
+
+    .personal {
+        border: 0.5px solid #fff;
+        transition: all 0.5s ease;
+    }
+
+        .personal:hover {
+            border: 0.5px solid #6c85a3;
+        }
+</style>
+@if (ApplyModal)
+{
+    @*<ApplyQuestionnaireComponent ToggleApplyModal="ToggleModalApply"></ApplyQuestionnaireComponent> THis was a questionnaire*@
+}
+else
+{
+    <div class="search-bar-container">
+
+        @if (LstJobs != null)
+        {
+            <!--Search bar-->
+            @*<input type="text" class="form-control w-75 mt-2 mb-3" placeholder="search" @bind-value="searchTerm">*@
+            <div class="searchbar">
+                <div class="left-search">
+
+                    <div class="searchTitle">
+                        <span><input type="text" placeholder="Job Title/Compensation" @bind="SearchTerm"></span>
+                    </div>
+                    <div class="searchLocation">
+                        <span><input type="text" placeholder="Location" @bind="SearchLocation"></span>
+                    </div>
+                    <div style="padding-bottom: 25px; padding-left: 15px;">
+                        <span><button class="btn searchButton btn-info btn-sm" @onclick="RealSearch">Search</button></span>
+                    </div>
+                </div>
+
+                <div class="filterSection">
+                    @if (JobTypes != null)
+                    {
+
+                        <select class="filterjob" @onchange="@onValChanged" style="display: inline-block; margin-right: 5px;">
+                            @if (!jobFilterApplied)
+                            {
+                                <option value="" disabled selected> Job Type</option>
+                            }
+                            @foreach (var jobType in JobTypes)
+                            {
+                                <option value="@jobType.Type"> @jobType.Type </option>
+                            }
+                        </select>
+
+                        @if (jobFilterApplied)
+                        {
+                            <div class="filterpill" style="display: inline-block;">
+                                <span style="font-size: 13px;">@JobFilter</span>
+                                <span><img src="Icon_close.png" alt="close" class="filterClose" @onclick="Clear" style="cursor:pointer;" /></span>
+                            </div>
+                        }
+                    }
+                    @* <div>
+                            @if (jobFilterApplied)
+                            {
+                                <div class="filterpill mt-2">
+                                    <span style="font-size: 13px;">@JobFilter</span>
+                                    <span><img src="Icon_close.png" alt="close" class="filterClose" @onclick="Clear" style="cursor:pointer;" /></span>
+                                </div>
+                            }
+                        </div> *@
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="profile-wrapper">
+        @if (LstJobs != null && LstJobs.Count > 0)
+        {
+            <div class="left">
+
+                @if (LstJobs != null && LstJobs.Count > 0)
+                {
+
+                    @* <p><strong>Total jobs available: @LstJobs.Count</strong></p> *@
+
+                    @foreach (var job in LstJobs)
+                    {
+                        <div class="personal content" @onclick="() => ViewJob(job, State.Id)" style="cursor: pointer">
+
+                            <div class="top">
+                                <h5 class="box-title" style="color: #6c85a3;">@job.Title </h5>
+                            </div>
+
+                            <ul class="list-group">
+
+                                <p class="mt-2" style="font-size: 14px;"><i class="fas fa-map-marker-alt"></i> &nbsp; @job.Location</p>
+                                @if (job.Description.Length > 200)
+                                {
+                                    string shortented = job.Description.Substring(0, 200) + "...";
+                                    <p class="box-description" style="font-size: 13.5px;"> @shortented </p>
+                                }
+                                else
+                                {
+                                    <p class="box-description" style="font-size: 13.5px;"> @job.Description </p>
+                                }
+                            </ul>
+                        </div>
+
+                    }
+
+                }
+                else
+                {
+                    <p> No Jobs found</p>
+                }
+            </div>
+
+            <div class="right">
+
+                <div class="content">
+
+                    @if (CurrentJob2 != null && LstJobs.Count > 0)
+                    {
+                        <div class="rightbox">
+                            <!--Details box-->
+                            <div>
+                                <h4 style="color: #6c85a3; font-weight: bold;">@CurrentJob2.Title</h4>
+                                <p style="font-size: 14px;" class="mt-2"><i class="fas fa-map-marker-alt"></i> &nbsp; @CurrentJob2.Location</p>
+                                @if (!IsShown)
+                                {
+                                    <button class="btn btn-primary btn-sm" @onclick="ApplyJob">Apply</button>
+                                }
+                                else
+                                {
+                                    <p>You have already applied for this job</p>
+                                }
+                                <hr />
+
+                                <p style="font-size: 13.5px;">@CurrentJob2.Description</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div hidden="@Spinner" class="spinner"></div>
+            <div hidden="@NoData"><h2>No Jobs Found</h2></div>
+        }
+    </div>
+}
+
+@code
+{
+    //Application application = new Application();
+    private async Task Apply(Job jobTest, int id)
+    {
+
+        if (State.IsUserProfileComplete)
+        {
+
+            Application application = new Application();
+
+            try
+            {
+                application.JobId = jobTest.Id;
+                application.AppUserId = id;
+                application.TimeApplied = DateTime.Now;
+                await httpClient.PostAsJsonAsync($"api/Application/", application);
+                await jsRuntime.InvokeVoidAsync("alert", "You Have Applied Successfully");
+                IsShown = !IsShown;
+            }
+            catch {
+                await jsRuntime.InvokeVoidAsync("alert", "There was an error in sending your application.");
+            }
+
+            //await httpClient.PostAsJsonAsync($"api/ApplicationPhase/{State.Id}", CurrentJob2);
+
+        }
+        else
+        {
+            NavManager.NavigateTo("/incomplete");
+        }
+
+    }
+
+    private void ApplyJob()
+    {
+        if(State.IsUserProfileComplete)
+        {
+            ToggleModalApply();
+        }
+        else
+        {
+            NavManager.NavigateTo("/incomplete");
+        }
+    }
+
+    bool ApplyModal = false;
+    private async Task ToggleModalApply()
+    {
+        //application.beginApplication = DateTime.Now
+        ApplyModal = !ApplyModal;
+        try
+        {
+            Console.WriteLine("Here");
+            if (State.QuestionnaireFilled)
+            {
+                await Apply(CurrentJob2, State.Id);
+                State.QuestionnaireFilled = false;
+            }
+            Console.WriteLine("This ran");
+
+
+        }
+        catch (Exception ex) { }
+
+
+    }
+
+}

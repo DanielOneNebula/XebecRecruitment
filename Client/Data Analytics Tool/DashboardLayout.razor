@@ -1,0 +1,456 @@
+﻿@page "/data-analytics-tool"
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+@inject HttpClient client
+@inject State State
+@using XebecPortal.Client.Data_Analytics_Tool.User_Analytics;
+@using XebecPortal.Client.Data_Analytics_Tool;
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800&display=swap');
+
+    * {
+        font-family: 'Montserrat', sans-serif;
+        margin-top: 0px;
+    }
+
+    .wrapper {
+        height: 100vh;
+        width: 100%;
+        overflow: hidden;
+        position: absolute;
+    }
+
+    .nav {
+        height: 8vh;
+        background-color: #00BCAE;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .nav-title {
+        height: 100%;
+        width: 90%;
+        font-size: 15px;
+        color: #fff;
+        padding: 1rem 0.8rem;
+    }
+
+    .nav-icon {
+        height: 100%;
+        width: 5%;
+        font-size: 25px;
+        color: #fff;
+        text-align: right;
+        cursor: pointer;
+        padding: 0.5rem 0.8rem;
+    }
+
+    .footer-container {
+        width: 100%;
+        height: 6vh;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        background-color: #00BCAE;
+        color: #fff;
+    }
+
+        .footer-container span {
+            font-size: 13px;
+            font-weight: bold;
+            margin-right: 2rem;
+        }
+
+    .main-body {
+        height: 86vh;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .dash-container {
+        background-color: white;
+        height: 90%;
+        width: 90%;
+        margin: auto;
+        overflow-y: auto;
+    }
+
+    .header {
+        height: 15%;
+        width: 100%;
+        padding: 1.2rem 0 0 0;
+        background-color: #044e5b;
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        align-items: center;
+        text-align: center;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+
+        .header h5 {
+            font-weight: bold;
+        }
+
+        .header p {
+            font-size: 14px;
+            font-style: italic;
+        }
+
+    .main {
+        width: 100%;
+        height: 84%;
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #00BCAE;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+    /*#44c1e6*/
+    .dashboard-nav {
+        max-height: 100vh;
+        width: 300px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: #00BCAE;
+        z-index: 1;
+        box-shadow: rgba(0, 0, 0, 0.2) 0px 60px 40px -7px;
+    }
+
+    .dashboard-nav-header {
+        height: 8vh;
+        text-align: left;
+        width: 20%;
+    }
+
+    .dashboard-nav-icon {
+        font-size: 25px;
+        color: ivory;
+        padding: 15px 8px 8px 32px;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .dashboard-nav-main {
+        height: 86vh;
+        width: 100%;
+    }
+
+    .dashboard-nav-footer {
+        height: 6vh;
+        width: 100%;
+        cursor: pointer;
+    }
+
+    .dashboard-nav-component {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 15px;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .nav-item {
+        height: 55px;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px -50px 36px -28px inset;
+    }
+
+        .nav-item:hover {
+            box-shadow: rgb(204, 219, 232) 3px 3px 6px 0px inset, rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset;
+        }
+
+    .left {
+        margin-left: 10%;
+        font-size: 20px;
+        margin-top: 5%;
+        color: ivory;
+        width: 10%;
+        height: 50%;
+    }
+
+    .right {
+        margin-left: 10%;
+        margin-top: 6.5%;
+        width: 70%;
+        height: 50%;
+    }
+
+    .heading {
+        font-size: 15px;
+        font-weight: 500;
+        color: ivory;
+    }
+
+    department-container {
+        width: inherit;
+        height: auto;
+    }
+
+    .department-name {
+        font-size: 13px;
+        font-weight: 300;
+        padding-top: 5px;
+        height: 30px;
+        color: snow;
+        padding-left: 30px;
+        cursor: pointer;
+        width: 100%;
+    }
+
+        .department-name:hover {
+            height: 30px;
+            width: 100%;
+            color: snow;
+            padding-top: 5px;
+            padding-left: 30px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 300;
+            box-shadow: rgb(204, 219, 232) 3px 3px 6px 0px inset, rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset;
+        }
+
+    .header-heading {
+        width: 90%;
+        height: 100%;
+        margin-left: 5%;
+        justify-content: center;
+        flex-direction: column;
+        align-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .header-icon {
+        width: 5%;
+        height: 100%;
+        justify-content: center;
+        align-content: center;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        cursor: pointer;
+    }
+</style>
+
+<div class="wrapper">
+
+    <div class="nav">
+        <div class="nav-title">
+            <h5>Xebec Platform</h5>
+        </div>
+
+        <div class="nav-icon">
+            <i class="fas fa-user"></i>
+        </div>
+
+        <div class="nav-icon" @onclick="@menuController">
+            <i class="fas fa-bars"></i>
+        </div>
+    </div>
+
+    <div class="dashboard-nav" hidden="@dashboard.menu">
+        <div class="dashboard-nav-header">
+            <div class="dashboard-nav-icon" @onclick="@menuController">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+        <div class="dashboard-nav-main">
+            <div class="nav-item" @onclick="@jobBoardController">
+                <div class="left">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="right">
+                    <h3 class="heading">Job Board</h3>
+                </div>
+            </div>
+            <div hidden="@dashboard.jobBoard" class="department-container">
+                <h3 class="department-name" @onclick="@toViewJobs">View Jobs</h3>
+                <h3 class="department-name" @onclick="@toViewPostedJobs">View Posted Jobs</h3>
+                <h3 class="department-name" @onclick="@toPostJobs">Post Job</h3>
+            </div>
+            <div class="nav-item" @onclick="@CandidateAnalyticsController">
+                <div class="left">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="right">
+                    <h3 class="heading">Candidate Analytics</h3>
+                </div>
+            </div>
+            <div hidden="@dashboard.candidateAnalytics" class="department-container">
+                <h3 class="department-name" @onclick="@toViewCandidates">View Candidates</h3>
+                <h3 class="department-name" @onclick="@toViewIdealCandidate">View Posted Jobs</h3>
+
+            </div>
+            <div class="nav-item" @onclick="@DataAnalyticsController">
+                <div class="left">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="right">
+                    <h3 class="heading">Data Analytics</h3>
+                </div>
+            </div>
+            <div hidden="@dashboard.dataAnalytics" class="department-container">
+                <h3 class="department-name" @onclick="@toDepartment">Departmental Analysis</h3>
+                <h3 class="department-name" @onclick="@toRegistration">Registered User Data</h3>
+                <h3 class="department-name" @onclick="@toTraffic">Site Traffic</h3>
+                <h3 class="department-name" @onclick="@toFill">Time To Fill</h3>
+                <h3 class="department-name" @onclick="@toHire">Time To Hire</h3>
+            </div>
+
+        </div>
+
+        <div class="dashboard-nav-footer">
+            <a href="#" class="dashboard-nav-component" style="position: relative; bottom: 0;"><i class="fas fa-sign-out-alt"></i> Logout </a>
+        </div>
+    </div>
+    <div class="main-body">
+        <div class="dash-container">
+
+            <div class="header">
+                <h5 style="color:#fff;">Xebec Analytics Dashboard</h5>
+            </div>
+
+            <div class="main">
+                @{
+                    if (dashboard.department == true)
+                    {
+                        <DepartmentData />
+                    }
+                    else if (dashboard.registration == true)
+                    {
+                        <RegistrationData />
+                    }
+                    else if (dashboard.traffic == true)
+                    {
+                        <TrafficData />
+                    }
+                    else if (dashboard.fill == true)
+                    {
+                        <FillData />
+                    }
+                    else if (dashboard.hire == true)
+                    {
+                        <HireData />
+                    }
+                    else if (dashboard.candidateCandidates == true)
+                    {
+                        <XebecPortal.Client.Data_Analytics_Tool.Candidate_Analytics.CandidateAnalytics />
+                    }
+                    else if (dashboard.candidateIdeal == true)
+                    {
+                        <XebecPortal.Client.Data_Analytics_Tool.Candidate_Analytics.IdealCandidate />
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer-container">
+        <span>Nebula 2021 &reg;</span>
+    </div>
+</div>
+
+@code {
+
+    private Dashboard dashboard { get; set; } = new Dashboard();
+
+    private void toViewJobs()
+    {
+        NavigationManager.NavigateTo("jobboard");
+    }
+    private void toViewPostedJobs()
+    {
+        NavigationManager.NavigateTo("jobposting");
+    }
+    private void toPostJobs()
+    {
+        NavigationManager.NavigateTo("addpostsub");
+    }
+    private void menuController()
+    {
+        dashboard.menu = !dashboard.menu;
+    }
+    private void jobBoardController()
+    {
+
+        dashboard.candidateAnalytics = dashboard.dataAnalytics = true;
+        dashboard.jobBoard = !dashboard.jobBoard;
+    }
+
+    private void DataAnalyticsController()
+    {
+
+        dashboard.candidateAnalytics = dashboard.jobBoard = true;
+        dashboard.registration = dashboard.department = dashboard.traffic = dashboard.fill = dashboard.hire = dashboard.candidateCandidates = dashboard.candidateIdeal = false;
+        dashboard.dataAnalytics = !dashboard.dataAnalytics;
+    }
+    private void CandidateAnalyticsController()
+    {
+
+        dashboard.dataAnalytics = dashboard.jobBoard = true;
+        dashboard.registration = dashboard.department = dashboard.traffic = dashboard.fill = dashboard.hire = dashboard.candidateCandidates = dashboard.candidateIdeal = false;
+        dashboard.candidateAnalytics = !dashboard.candidateAnalytics;
+    }
+    private void toDepartment()
+    {
+        dashboard.department = !dashboard.department;
+
+        dashboard.registration = dashboard.traffic = dashboard.fill = dashboard.hire = dashboard.candidateCandidates = dashboard.candidateIdeal = false;
+
+    }
+    private void toRegistration()
+    {
+        dashboard.registration = !dashboard.registration;
+
+        dashboard.department = dashboard.traffic = dashboard.fill = dashboard.hire = dashboard.candidateCandidates = dashboard.candidateIdeal = false;
+
+    }
+    private void toTraffic()
+    {
+        dashboard.traffic = !dashboard.traffic;
+
+        dashboard.registration = dashboard.department = dashboard.fill = dashboard.hire = dashboard.candidateCandidates = dashboard.candidateIdeal = false;
+
+    }
+    private void toFill()
+    {
+        dashboard.fill = !dashboard.fill;
+
+        dashboard.registration = dashboard.traffic = dashboard.department = dashboard.hire = dashboard.candidateCandidates = dashboard.candidateIdeal = false;
+
+    }
+    private void toHire()
+    {
+        dashboard.hire = !dashboard.hire;
+
+        dashboard.registration = dashboard.traffic = dashboard.fill = dashboard.department = dashboard.candidateCandidates = dashboard.candidateIdeal = false;
+    }
+
+    private void toViewCandidates()
+    {
+
+        dashboard.candidateCandidates = true;
+        dashboard.registration = dashboard.traffic = dashboard.fill = dashboard.department = dashboard.hire = dashboard.candidateIdeal = false;
+    }
+    private void toViewIdealCandidate()
+    {
+
+        dashboard.candidateIdeal = true;
+        dashboard.registration = dashboard.traffic = dashboard.fill = dashboard.department = dashboard.hire = dashboard.candidateCandidates = false;
+        
+    }
+}

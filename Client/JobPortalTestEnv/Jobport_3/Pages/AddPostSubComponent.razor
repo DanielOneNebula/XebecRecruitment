@@ -1,0 +1,184 @@
+@inject HttpClient httpClient
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@using System.Net.Http
+@inject State State
+
+<style>
+
+    .profile-wrapper {
+        width: 100%;
+        height: 100%;
+        background-color: #f5f5f5;
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: auto;
+        min-height: 0;
+        position: relative;
+    }
+
+        .profile-wrapper::-webkit-scrollbar {
+            width: 0.5em;
+        }
+
+        .profile-wrapper::-webkit-scrollbar-track {
+            box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-wrapper::-webkit-scrollbar-thumb {
+            background-color: #a9baba;
+        }
+
+    /*loading test*/
+    .spinner {
+        border: 16px solid silver;
+        border-top: 16px solid #337AB7;
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        animation: spin 700ms linear infinite;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        position: absolute;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg)
+        }
+
+        100% {
+            transform: rotate(360deg)
+        }
+    }
+
+    /*new styles*/
+
+    .form-content {
+        width: 90%;
+        height: 90%;
+        margin: 10px auto;
+        max-width: 600px;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+        padding: 20px 10px 30px 10px;
+        box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    }
+
+    label {
+        font-weight: bold;
+        font-size: 14px;
+        margin-top: 20px;
+    }
+
+    .inner-content {
+        width: 80%;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .inner-content input, .inner-content select {
+            padding: 5px 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 0.5px solid #6c85a3;
+        }
+
+        .inner-content textarea {
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 0.5px solid #6c85a3;
+        }
+
+    .outer {
+        width: 95%;
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .btn-post {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+    }
+</style>
+
+<div class="profile-wrapper">
+
+    <div class="outer">
+
+        <div class="form-content">
+
+            <div class="inner-content">
+                <label for="jobTitle">Job Title:</label>
+                <input type="text" id="jobTitle" class="jobTitle" placeholder="Job Title" @bind="job.Title">
+            </div>
+
+            <div class="inner-content">
+                <label for="location">Location:</label>
+                <input type="text" id="location" class="location" placeholder="Location" @bind="job.Location">
+            </div>
+
+             <div class="inner-content">
+                <label for="department">Department:</label>
+                <select class="department" id="inputGroupSelect01" @onchange="OnDepartmentChanged">
+                    <option selected disabled>-- Select Department --</option>
+                   @foreach (var department in Departments)
+                   {
+                       <option value="@department.Id">@department.DepartmentName</option>
+                   }
+                </select>
+            </div>
+
+        </div>
+
+        <div class="form-content">
+
+            <div class="inner-content">
+                <label for="jobType">Job Type:</label>
+                <select class="jobType custom-select right-input jobTypeSelect2" id="jobType" multiple="multiple">
+                    @foreach (var items in jobTypes)
+                    {
+                        <option value="@items.Id">@items.Type</option>
+                    }
+                </select>
+            </div>
+
+            <div class="inner-content">
+                <label for="jobPlatform">Job Platform:</label>
+                <select class="jobPlatform custom-select right-input jobPlatformSelect2" id="jobPlatform" multiple="multiple">
+                    @foreach (var items in jobPlatform)
+                    {
+                        <option value="@items.Id">@items.PlatformName</option>
+
+                    }
+                </select>
+            </div>
+
+            <div class="inner-content">
+                <label for="description">Job Description:</label>
+                <textarea id="description" class="description" rows="5" @bind="job.Description" placeholder="Job Description" />
+            </div>
+        </div>
+
+        <button type="button" @onclick="SendData" class="btn btn-info btn-sm btn-post">Add</button>
+    </div>
+</div>
+
+@code{
+
+    int i = 0;
+
+}
